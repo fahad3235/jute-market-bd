@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jute Market BD &#8212; Jute Cultivation &amp; Trading Log</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <div>
+      <h1 data-i18n="appTitle">Jute Market BD</h1>
+      <p class="subtitle" data-i18n="appSub">Jute cultivation &amp; trading log for farmers</p>
+    </div>
+    <button id="langBtn" type="button" class="lang-btn">&#2476;&#2494;&#2434;&#2482;&#2494;</button>
+  </div>
+</header>
+
+<nav class="tabs" role="tablist">
+  <button type="button" data-tab="dashboard" class="tab active" data-i18n="tabDashboard">Dashboard</button>
+  <button type="button" data-tab="plots" class="tab" data-i18n="tabPlots">Plots</button>
+  <button type="button" data-tab="data" class="tab" data-i18n="tabData">Data</button>
+</nav>
+
+<main>
+  <!-- DASHBOARD -->
+  <section id="tab-dashboard" class="tabpage">
+    <p id="asofNote" class="asof" hidden></p>
+    <div class="card">
+      <h2 data-i18n="dueTitle">Due &amp; overdue</h2>
+      <div id="dueList"></div>
+      <p id="dueEmpty" class="empty" data-i18n="noDue">Nothing due in the next 7 days.</p>
+    </div>
+    <div class="stat-grid">
+      <div class="stat"><span class="stat-num" id="statPlots">0</span><span class="stat-lbl" data-i18n="statPlots">Plots</span></div>
+      <div class="stat"><span class="stat-num" id="statArea">0</span><span class="stat-lbl" data-i18n="statArea">Total area (decimals)</span></div>
+      <div class="stat"><span class="stat-num" id="statFibre">0</span><span class="stat-lbl" data-i18n="statFibre">Fibre harvested (kg)</span></div>
+      <div class="stat"><span class="stat-num" id="statSales">&#2547;0</span><span class="stat-lbl" data-i18n="statSales">Sales income</span></div>
+      <div class="stat"><span class="stat-num" id="statExpenses">&#2547;0</span><span class="stat-lbl" data-i18n="statExpenses">Total expenses</span></div>
+      <div class="stat"><span class="stat-num" id="statProfit">&#2547;0</span><span class="stat-lbl" data-i18n="statProfit">Net profit</span></div>
+    </div>
+    <div class="card">
+      <h2 data-i18n="chartTitle">Fibre yield per plot (kg)</h2>
+      <div id="chart" class="chart"></div>
+      <p id="chartEmpty" class="empty" data-i18n="chartEmpty">Add a harvest to see the chart.</p>
+    </div>
+    <div class="card">
+      <h2 data-i18n="plotsTitle">Your plots</h2>
+      <div id="dashPlotList"></div>
+      <p id="dashPlotsEmpty" class="empty" data-i18n="plotsEmpty">No plots yet. Add your first plot below to start tracking.</p>
+    </div>
+  </section>
+
+  <!-- PLOTS -->
+  <section id="tab-plots" class="tabpage" hidden>
+    <div id="plotListWrap">
+      <div class="card">
+        <h2 id="plotFormTitle" data-i18n="addPlot">Add plot</h2>
+        <form id="plotForm">
+          <div class="form-grid">
+            <label><span data-i18n="plotName">Plot name</span>
+              <input id="plotName" type="text" maxlength="60" autocomplete="off" placeholder="e.g. North Field">
+            </label>
+            <label><span data-i18n="variety">Variety</span>
+              <select id="plotVariety">
+                <option value="Tossa">Tossa</option>
+                <option value="White">White</option>
+                <option value="Mesta">Mesta</option>
+                <option value="Kenaf">Kenaf</option>
+              </select>
+            </label>
+            <label><span data-i18n="areaValue">Area</span>
+              <input id="plotArea" type="number" min="0.01" max="100000" step="any" placeholder="33">
+            </label>
+            <label><span data-i18n="areaUnit">Unit</span>
+              <select id="plotAreaUnit">
+                <option value="decimals" data-i18n="decimals">decimals</option>
+                <option value="bigha" data-i18n="bigha">bigha (1 bigha = 33 decimals)</option>
+              </select>
+            </label>
+            <label><span data-i18n="sowingDate">Sowing date</span>
+              <input id="plotSowing" type="date">
+            </label>
+          </div>
+          <p id="plotError" class="error" role="alert"></p>
+          <button type="submit" class="btn primary" id="plotSubmitBtn" data-i18n="addPlot">Add plot</button>
+          <button type="button" class="btn" id="plotCancelBtn" data-i18n="cancelEdit" hidden>Cancel edit</button>
+        </form>
+      </div>
+      <div class="card">
+        <h2 data-i18n="plotsTitle">Your plots</h2>
+        <div id="plotList"></div>
+        <p id="plotsEmpty" class="empty" data-i18n="plotsEmpty">No plots yet. Add your first plot below to start tracking.</p>
+      </div>
+    </div>
+
+    <!-- PLOT DETAIL -->
+    <div id="plotDetailWrap" hidden>
+      <button type="button" class="btn" id="backBtn" data-i18n="backToPlots">&#8592; All plots</button>
+      <div class="card">
+        <h2 id="detailTitle">Plot details</h2>
+        <div id="detailSummary" class="kv"></div>
+      </div>
+      <div class="card">
+        <h2 data-i18n="timelineTitle">Cultivation timeline</h2>
+        <div id="timeline" class="timeline"></div>
+        <p class="hint" data-i18n="tlTypical">Typical ranges, not promises.</p>
+      </div>
+      <div class="card">
+        <h2 data-i18n="harvestTitle">Harvest log</h2>
+        <form id="harvestForm">
+          <div class="form-grid">
+            <label><span data-i18n="harvestDate">Harvest date</span><input id="harvDate" type="date"></label>
+            <label><span data-i18n="greenKg">Green plant weight (kg)</span><input id="harvGreen" type="number" min="0.01" step="any" placeholder="1000"></label>
+            <label><span data-i18n="fibreKg">Fibre yield (kg)</span><input id="harvFibre" type="number" min="0.01" step="any" placeholder="120"></label>
+          </div>
+          <p id="harvError" class="error" role="alert"></p>
+          <button type="submit" class="btn primary" data-i18n="addHarvest">Add harvest</button>
+        </form>
+        <div id="harvestList"></div>
+        <p id="harvestEmpty" class="empty" data-i18n="noHarvest">No harvest recorded yet.</p>
+        <p class="hint" id="harvestStats"></p>
+      </div>
+      <div class="card">
+        <h2 data-i18n="salesTitle">Sales ledger</h2>
+        <p class="hint" data-i18n="priceNote">Prices here are your own records, not market quotes.</p>
+        <form id="saleForm">
+          <div class="form-grid">
+            <label><span data-i18n="buyer">Buyer name</span><input id="saleBuyer" type="text" maxlength="60" autocomplete="off"></label>
+            <label><span data-i18n="saleDate">Sale date</span><input id="saleDate" type="date"></label>
+            <label><span data-i18n="qtyKg">Quantity (kg)</span><input id="saleQty" type="number" min="0.01" step="any" placeholder="100"></label>
+            <label><span data-i18n="pricePerKg">Price per kg (&#2547;, your own record)</span><input id="salePrice" type="number" min="0.01" step="any" placeholder="55"></label>
+          </div>
+          <p id="saleError" class="error" role="alert"></p>
+          <button type="submit" class="btn primary" data-i18n="addSale">Add sale</button>
+        </form>
+        <div id="saleList"></div>
+        <p id="saleEmpty" class="empty" data-i18n="noSales">No sales recorded yet.</p>
+      </div>
+      <div class="card">
+        <h2 data-i18n="expensesTitle">Expenses</h2>
+        <form id="expenseForm">
+          <div class="form-grid">
+            <label><span data-i18n="category">Category</span>
+              <select id="expCategory">
+                <option value="Seed" data-i18n="catSeed">Seed</option>
+                <option value="Fertilizer" data-i18n="catFertilizer">Fertilizer</option>
+                <option value="Labour" data-i18n="catLabour">Labour</option>
+                <option value="Retting" data-i18n="catRetting">Retting</option>
+                <option value="Transport" data-i18n="catTransport">Transport</option>
+                <option value="Other" data-i18n="catOther">Other</option>
+              </select>
+            </label>
+            <label><span data-i18n="expDate">Date</span><input id="expDate" type="date"></label>
+            <label><span data-i18n="amount">Amount (&#2547;)</span><input id="expAmount" type="number" min="0.01" step="any" placeholder="2000"></label>
+          </div>
+          <p id="expError" class="error" role="alert"></p>
+          <button type="submit" class="btn primary" data-i18n="addExpense">Add expense</button>
+        </form>
+        <div id="expenseList"></div>
+        <p id="expenseEmpty" class="empty" data-i18n="noExpenses">No expenses recorded yet.</p>
+      </div>
+      <div class="card">
+        <h2 data-i18n="profitTitle">Plot profit</h2>
+        <div id="profitBox" class="kv"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DATA -->
+  <section id="tab-data" class="tabpage" hidden>
+    <div class="card">
+      <h2 data-i18n="exportTitle">Backup</h2>
+      <button id="exportBtn" type="button" class="btn" data-i18n="exportBtn">Download JSON</button>
+      <button id="exportShowBtn" type="button" class="btn" data-i18n="exportFill">Show JSON</button>
+      <textarea id="importBox" rows="5" placeholder='{"app":"jute-market-bd","plots":[]}' aria-label="Backup JSON"></textarea>
+      <p class="hint" data-i18n="importHint">Paste a backup JSON below, or choose a backup file, and import.</p>
+      <input id="importFile" type="file" accept="application/json,.json">
+      <p id="importMsg" class="ok-msg"></p>
+      <button id="importBtn" type="button" class="btn" data-i18n="importBtn">Import JSON</button>
+    </div>
+    <div class="card danger">
+      <h2 data-i18n="eraseTitle">Erase everything</h2>
+      <button id="resetBtn" type="button" class="btn danger-btn" data-i18n="eraseBtn">Erase all data</button>
+    </div>
+  </section>
+</main>
+
+<footer><span data-i18n="footer">All data stays on this device in localStorage. No account, no network requests. Prices are your own records, not market quotes.</span></footer>
+
+<script src="js/logic.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
